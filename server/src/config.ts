@@ -21,7 +21,7 @@ export const config = {
     // Any OpenAI-compatible chat completions endpoint with tool calling. Defaults to Groq.
     apiKey: env('LLM_API_KEY') || env('GROQ_API_KEY'),
     baseUrl: env('LLM_BASE_URL', 'https://api.groq.com/openai/v1').replace(/\/$/, ''),
-    model: env('LLM_MODEL', 'llama-3.3-70b-versatile'),
+    model: env('LLM_MODEL', 'openai/gpt-oss-120b'),
   },
 };
 

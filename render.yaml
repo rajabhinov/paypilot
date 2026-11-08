@@ -20,6 +20,10 @@ services:
       - key: LLM_API_KEY
         sync: false
       - key: LLM_MODEL
-        value: llama-3.3-70b-versatile
+        value: openai/gpt-oss-120b
+      - key: APP_USER
+        sync: false
+      - key: APP_PASSWORD
+        sync: false
       - key: DEFAULT_CURRENCY
         value: USD

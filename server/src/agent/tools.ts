@@ -17,7 +17,7 @@ export interface ToolResult {
 
 const ref = { type: 'string', description: 'Invoice number (e.g. INQ-2026-1001) or client name/company' };
 
-export const toolDefs: ToolDef[] = [
+const baseToolDefs: ToolDef[] = [
   {
     type: 'function',
     function: {
@@ -130,6 +130,27 @@ export const toolDefs: ToolDef[] = [
     },
   },
 ];
+
+/**
+ * Some models (e.g. gpt-oss on Groq) send `null` for optional fields, and Groq rejects any call that
+ * doesn't match the schema. Let every optional property be null; the agent drops nulls before running.
+ */
+function allowNullOptionals(schema: any): any {
+  if (!schema || schema.type !== 'object' || !schema.properties) return schema;
+  const required = new Set<string>(schema.required ?? []);
+  const properties: Record<string, any> = {};
+  for (const [key, prop] of Object.entries<any>(schema.properties)) {
+    let p = prop.type === 'object' ? allowNullOptionals(prop) : prop.type === 'array' && prop.items ? { ...prop, items: allowNullOptionals(prop.items) } : prop;
+    if (!required.has(key) && typeof p.type === 'string') {
+      p = { ...p, type: [p.type, 'null'] };
+      if (p.enum) p.enum = [...p.enum, null];
+    }
+    properties[key] = p;
+  }
+  return { ...schema, properties };
+}
+
+export const toolDefs: ToolDef[] = baseToolDefs.map((t) => ({ ...t, function: { ...t.function, parameters: allowNullOptionals(t.function.parameters) } }));
 
 const str = (v: unknown) => (typeof v === 'string' ? v : v == null ? '' : String(v));
 const num = (v: unknown) => (v == null || v === '' ? undefined : Number(String(v).replace(/[^\d.]/g, '')) || undefined);

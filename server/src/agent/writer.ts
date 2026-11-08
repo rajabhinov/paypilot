@@ -41,7 +41,7 @@ export async function draftReminder(inv: Invoice, tone: Tone, daysOverdue: numbe
             }),
           },
         ],
-        { json: true, maxTokens: 300 },
+        { json: true, maxTokens: 1500 },
       );
       const parsed = JSON.parse(msg.content ?? '{}');
       if (parsed.subject && parsed.note) return { subject: String(parsed.subject), note: String(parsed.note), writtenBy: 'ai' };

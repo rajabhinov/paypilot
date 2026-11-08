@@ -103,7 +103,7 @@ export function Chat({ initial, aiMode, onChange }: { initial: ChatMessage[]; ai
                     ))}
                   </div>
                 )}
-                <div className="bubble">{m.content}</div>
+                <div className="bubble">{renderBold(m.content)}</div>
               </>
             )}
           </div>
@@ -135,5 +135,12 @@ export function Chat({ initial, aiMode, onChange }: { initial: ChatMessage[]; ai
         </button>
       </form>
     </aside>
+  );
+}
+
+/** Render **bold** spans from the model's replies; everything else stays plain text. */
+function renderBold(text: string) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, k) =>
+    part.startsWith('**') && part.endsWith('**') && part.length > 4 ? <strong key={k}>{part.slice(2, -2)}</strong> : part,
   );
 }

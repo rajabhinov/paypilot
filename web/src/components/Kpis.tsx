@@ -4,7 +4,7 @@ import type { Insights } from '../types';
 export function Kpis({ insights: i }: { insights: Insights }) {
   const c = i.currency;
   const tiles = [
-    { label: 'Outstanding', value: money(i.outstanding, c), sub: `${i.openCount} open invoice${i.openCount === 1 ? '' : 's'}` },
+    { label: 'Outstanding balance', tone: 'hero', value: money(i.outstanding, c), sub: `${i.openCount} open invoice${i.openCount === 1 ? '' : 's'}` },
     { label: 'Overdue', value: money(i.overdue.amount, c), sub: `${i.overdue.count} invoice${i.overdue.count === 1 ? '' : 's'}`, tone: i.overdue.count ? 'bad' : undefined },
     { label: 'Collected, 30 days', value: money(i.collected30, c), sub: 'reconciled payments' },
     { label: 'Avg. days to pay', value: i.avgDaysToPay === null ? '-' : `${i.avgDaysToPay}`, sub: i.onTimeRate === null ? 'no history yet' : `${Math.round(i.onTimeRate * 100)}% paid on time` },

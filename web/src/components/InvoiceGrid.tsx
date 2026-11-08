@@ -7,18 +7,18 @@ import type { AppState, Invoice } from '../types';
 const theme = themeQuartz.withParams({
   backgroundColor: 'var(--surface)',
   foregroundColor: 'var(--ink)',
-  headerBackgroundColor: 'var(--surface)',
+  headerBackgroundColor: 'var(--hover)',
   headerTextColor: 'var(--muted)',
   borderColor: 'var(--line)',
   rowHoverColor: 'var(--hover)',
   selectedRowBackgroundColor: 'var(--hover)',
   accentColor: 'var(--accent)',
-  fontFamily: 'IBM Plex Sans, system-ui, sans-serif',
+  fontFamily: 'Inter, system-ui, sans-serif',
   fontSize: 13,
   headerFontSize: 12,
-  headerFontWeight: 500,
-  rowHeight: 44,
-  headerHeight: 38,
+  headerFontWeight: 600,
+  rowHeight: 48,
+  headerHeight: 42,
   wrapperBorderRadius: 0,
   wrapperBorder: false,
 });
@@ -50,7 +50,7 @@ export function InvoiceGrid({
       {
         headerName: 'Invoice',
         field: 'number',
-        width: 150,
+        width: 165,
         cellRenderer: (p: ICellRendererParams<Invoice>) => (
           <span className="mono">
             {p.value}
@@ -58,18 +58,18 @@ export function InvoiceGrid({
           </span>
         ),
       },
-      { headerName: 'Client', valueGetter: (p) => p.data?.client.company || p.data?.client.name, flex: 1, minWidth: 140 },
+      { headerName: 'Client', valueGetter: (p) => p.data?.client.company || p.data?.client.name, flex: 1, minWidth: 120 },
       {
         headerName: 'Amount',
         field: 'total',
-        width: 120,
+        width: 100,
         type: 'rightAligned',
         cellClass: 'mono',
         valueFormatter: (p) => (p.data ? money(p.data.total, p.data.currency) : ''),
       },
       {
         headerName: 'Status',
-        width: 150,
+        width: 128,
         valueGetter: (p) => (p.data ? statusOf(p.data, now).label : ''),
         cellRenderer: (p: ICellRendererParams<Invoice>) => {
           if (!p.data) return null;
@@ -80,7 +80,7 @@ export function InvoiceGrid({
       { headerName: 'Due', field: 'dueDate', width: 92, valueFormatter: (p) => (p.value ? shortDate(p.value) : '') },
       {
         headerName: 'Follow-up',
-        width: 150,
+        width: 132,
         valueGetter: (p) => p.data?.followup.remindersSent ?? 0,
         cellRenderer: (p: ICellRendererParams<Invoice>) => {
           const f = p.data?.followup;
@@ -100,7 +100,7 @@ export function InvoiceGrid({
       },
       {
         headerName: '',
-        width: 210,
+        width: 240,
         sortable: false,
         cellRenderer: (p: ICellRendererParams<Invoice>) => {
           const i = p.data;

@@ -55,13 +55,14 @@ async function runWithLlm(convo: ChatMessage[]): Promise<ChatMessage> {
     const msg = await chat(messages, { tools: toolDefs });
     const calls = msg.tool_calls ?? [];
     if (!calls.length) {
-      return { role: 'assistant', content: (msg.content ?? '').trim() || 'Done.', at: nowIso(), actions, mode: 'llm' };
+      return { role: 'assistant', content: undouble((msg.content ?? '').trim()) || 'Done.', at: nowIso(), actions, mode: 'llm' };
     }
     messages.push({ role: 'assistant', content: msg.content ?? null, tool_calls: calls });
     for (const call of calls) {
       let args: Record<string, unknown> = {};
       try {
         args = JSON.parse(call.function.arguments || '{}');
+        args = Object.fromEntries(Object.entries(args).filter(([, v]) => v !== null));
       } catch {
         /* leave empty; tool will report missing fields */
       }
@@ -77,4 +78,10 @@ async function runWithLlm(convo: ChatMessage[]): Promise<ChatMessage> {
     actions,
     mode: 'llm',
   };
+}
+
+/** Some models occasionally emit the same reply twice back to back; keep one copy. */
+function undouble(text: string) {
+  const half = text.length / 2;
+  return Number.isInteger(half) && half > 20 && text.slice(0, half) === text.slice(half) ? text.slice(0, half) : text;
 }

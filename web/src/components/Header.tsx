@@ -14,7 +14,9 @@ export function Header({ state, run }: { state: AppState; run: (fn: () => Promis
           </svg>
         </span>
         <div>
-          <div className="name">PayPilot</div>
+          <div className="name">
+            Pay<b>Pilot</b>
+          </div>
           <div className="by">{status.business}</div>
         </div>
       </div>

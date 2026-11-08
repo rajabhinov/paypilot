@@ -1,4 +1,5 @@
 import express, { type NextFunction, type Request, type Response } from 'express';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,21 @@ import { computeInsights } from './services/insights.js';
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
+
+// Optional HTTP Basic Auth for public deployments. Enabled when APP_USER and APP_PASSWORD are set.
+// The PayPal webhook (signature-verified) and health check stay open.
+const appUser = process.env.APP_USER ?? '';
+const appPassword = process.env.APP_PASSWORD ?? '';
+if (appUser && appPassword) {
+  const expected = Buffer.from(`Basic ${Buffer.from(`${appUser}:${appPassword}`).toString('base64')}`);
+  const open = new Set(['/api/paypal/webhook', '/api/health']);
+  app.use((req, res, next) => {
+    if (open.has(req.path)) return next();
+    const got = Buffer.from(req.headers.authorization ?? '');
+    if (got.length === expected.length && crypto.timingSafeEqual(got, expected)) return next();
+    res.set('WWW-Authenticate', 'Basic realm="PayPilot", charset="UTF-8"').status(401).send('Authentication required');
+  });
+}
 
 const wrap = (fn: (req: Request, res: Response) => Promise<unknown> | unknown) => (req: Request, res: Response, next: NextFunction) =>
   Promise.resolve(fn(req, res)).catch(next);
